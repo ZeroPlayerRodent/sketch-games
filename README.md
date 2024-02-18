@@ -5,7 +5,7 @@ Simple games created in Common Lisp using the sketch graphics framework!
 
 First you will need to install [sketch](https://github.com/vydd/sketch).
 
-Then, load sketch in SBCL.
+Then, load sketch in a compatible Lisp interpreter.
 
 Finally, load the source code of the game you want to play.
 
