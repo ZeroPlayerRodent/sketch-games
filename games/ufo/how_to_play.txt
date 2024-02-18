@@ -1,0 +1,17 @@
+HOW TO PLAY UFO
+
+== CONTROLS ==
+
+A/D: Move left and right
+
+W: Toggle thrusters
+
+== OBJECTIVES ==
+
+Collect money while avoiding enemy UFOs to score points.
+
+If you collide with an enemy UFO, you lose.
+
+Use your thrusters to fly upwards.
+
+Have fun!

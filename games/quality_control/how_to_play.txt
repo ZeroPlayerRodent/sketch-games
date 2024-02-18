@@ -1,0 +1,15 @@
+HOW TO PLAY QUALITY CONTROL
+
+== CONTROLS ==
+
+1/2/3/4: Toggle incinerators
+
+== OBJECTIVES ==
+
+Toggle the incinerators to dispose of waste on the conveyor belts.
+
+Don't burn the burgers, let them pass.
+
+If you let waste pass through or incinerate a burger, you lose.
+
+Have fun!
