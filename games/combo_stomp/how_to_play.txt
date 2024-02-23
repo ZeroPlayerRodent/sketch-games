@@ -1,0 +1,17 @@
+HOW TO PLAY COMBO STOMP
+
+== CONTROLS ==
+
+A/D: Move left and right
+
+W: Flip gravity
+
+== OBJECTIVES ==
+
+Flip gravity to stomp the non-spiked enemies.
+
+Stomping enemies scores points.
+
+Avoid the spiked enemies, touching one is game over.
+
+Have fun!

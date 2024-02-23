@@ -1,0 +1,180 @@
+(defpackage :combo-stomp (:use :cl :sketch))
+(in-package :combo-stomp)
+
+(defclass bad-ship ()
+  (
+    (x :initarg :x :initform 0)
+    (y :initarg :y :initform 0)
+    (s :initarg :s :initform 0)
+    (d :initarg :d :initform 0)
+  )
+)
+
+(defclass splatter ()
+  (
+    (x :initarg :x :initform 0)
+    (y :initarg :y :initform 0)
+    (l :initarg :l :initform 20)
+  )
+)
+
+(defparameter *enemies* (list
+(make-instance 'bad-ship :x 0 :y 100 :s 2.5)
+(make-instance 'bad-ship :x 0 :y 200 :s 3)
+(make-instance 'bad-ship :x 0 :y 300 :s 3.5)
+(make-instance 'bad-ship :x 0 :y 400 :s 4)
+(make-instance 'bad-ship :x 0 :y 500 :s 4.5)
+)
+)
+
+(defparameter *blood* (make-array 0 :fill-pointer 0 :adjustable t))
+
+(defparameter *px* 200)
+(defparameter *py* 600)
+(defparameter *gravity* 0.3)
+(defparameter *movement* 0)
+(defparameter *walk* 0)
+(defparameter *yflip* 1)
+(defparameter *xflip* 1)
+(defparameter *max-fall* 15)
+
+(defparameter *lost* 0)
+(defparameter *score* 0)
+
+(defun if-collided (posx posy)
+  (if (and(and (<= (- posx 16) (+ *px* 24))(>= (+ posx (+ 64 16)) (+ *px* 24))) (and (<= (- posy 16) (+ *py* 24))(>= (+ posy (+ 32 16)) (+ *py* 24))))
+  1
+  ()
+  )
+)
+
+(defun bounce ()
+  (setf *movement* (* (- *gravity*) 15))
+)
+
+
+(defsketch combo-stomp
+  (
+   (title "UFO")
+   (width 500)
+   (height 650)
+   (player (load-resource "img/player.png"))
+   (player2 (load-resource "img/player2.png"))
+   (enemy (load-resource "img/enemy.png"))
+   (spike (load-resource "img/spike.png"))
+   (splatter (load-resource "img/splat.png"))
+   (bg (load-resource "img/bg.png"))
+  )
+  
+  (defun over ()
+     (draw bg :x 0 :y 0 :width 500 :height 650)
+     (rect 100 150 200 200)
+     (text "YOU LOSE!!!" 100 150)
+     (text (write-to-string *score*) 100 200)
+     (text "Press R to restart." 100 250)
+   )
+  (draw bg :x 0 :y 0 :width 500 :height 650)
+  (if (> *gravity* 0)(draw player :x *px* :y *py* :width 48 :height 48)(draw player2 :x *px* :y *py* :width 48 :height 48))
+  
+  (let ((i 0))
+    (loop
+      (if (>= i (length *blood*))(return)())
+      (draw splatter :x (- (slot-value (elt *blood* i) 'x) 16) :y (- (slot-value (elt *blood* i) 'y) 16) :width 128 :height 64)
+      (setf (slot-value (elt *blood* i) 'l) (- (slot-value (elt *blood* i) 'l) 1))
+      (if (= (slot-value (elt *blood* i) 'l) 0)(
+      (lambda ()
+        (setf *blood* (delete (elt *blood* i) *blood*))
+      )
+      )())
+      (setf i (+ i 1))
+    )
+  )
+  
+  (let ((i 0))
+    (loop
+      (if (= i (length *enemies*))(return)())
+      (if (= (slot-value (elt *enemies* i) 'd) 0)
+      (draw enemy :x (slot-value (elt *enemies* i) 'x) :y (slot-value (elt *enemies* i) 'y) :width 64 :height 32)
+      (draw spike :x (- (slot-value (elt *enemies* i) 'x) 16) :y (- (slot-value (elt *enemies* i) 'y) 8) :width (+ 64 32) :height (+ 32 16))
+      )
+      (setf (slot-value (elt *enemies* i) 'x) (+ (slot-value (elt *enemies* i) 'x) (slot-value (elt *enemies* i) 's)))
+      (if (or(> (slot-value (elt *enemies* i) 'x) 500)(< (slot-value (elt *enemies* i) 'x) (- (+ 64 32))))
+      ((lambda ()
+        (setf (slot-value (elt *enemies* i) 'y) (random 625 (make-random-state t)))
+        (setf (slot-value (elt *enemies* i) 's) (- (slot-value (elt *enemies* i) 's)))
+        (setf (slot-value (elt *enemies* i) 'd) (random 2 (make-random-state t)))
+      ))
+      ())
+      (if (if-collided (slot-value (elt *enemies* i) 'x) (slot-value (elt *enemies* i) 'y))(
+      (lambda ()
+        (if (= (slot-value (elt *enemies* i) 'd) 1)(setf *lost* 1)())
+        (vector-push-extend (make-instance 'splatter :x (slot-value (elt *enemies* i) 'x)  :y (slot-value (elt *enemies* i) 'y)) *blood* )
+        (bounce)
+        (if (= *lost* 0)(setf *score* (+ *score* 125))())
+        (setf (slot-value (elt *enemies* i) 'y) (random 625 (make-random-state t)))
+        (setf (slot-value (elt *enemies* i) 'd) (random 2 (make-random-state t)))
+        (if (> (slot-value (elt *enemies* i) 's) 0)(setf (slot-value (elt *enemies* i) 'x) (- (+ 64 32)))(setf (slot-value (elt *enemies* i) 'x) 500))
+        (if (> (slot-value (elt *enemies* i) 's) 0)
+          (setf (slot-value (elt *enemies* i) 's) (+ (slot-value (elt *enemies* i) 's) 0.25))
+          (setf (slot-value (elt *enemies* i) 's) (- (slot-value (elt *enemies* i) 's) 0.25))
+        )
+      )
+      )())
+      (setf i (+ i 1))
+    )
+  )
+  
+  (rect 0 0 100 25)
+  (text (write-to-string *score*) 0 0)
+
+  (setf *movement* (+ *movement* *gravity*))
+  (setf *py* (+ *py* *movement*))
+  (setf *px* (+ *px* *walk*))
+  (if (> *py* 600)(setf *movement* 0)())
+  (if (> *py* 600)(setf *py* 600)())
+  (if (> 0 *px*)(setf *px* 0)())
+  (if (> *px* 450)(setf *px* 450)())
+  (if (> *movement* *max-fall*)(setf *movement* *max-fall*)())
+  (if (< *movement* (- *max-fall*))(setf *movement* (- *max-fall*))())
+  (if (> 0 *py*)(setf *movement* 0)())
+  (if (> 0 *py*)(setf *py* 0)())
+  
+  (if (= *lost* 1)(over)())
+  
+)
+
+(defun thrusters ()
+  (setf *gravity* (- *gravity*))
+  (setf *movement* (* *gravity* 2))
+)
+
+
+(defun reset ()
+  (setf *lost* 0)
+  (setf *px* 200)
+  (setf *py* 600)
+  (setf *score* 0)
+  (setf *movement* 0)
+  (setf *gravity* 0.3)
+  (setf *enemies* (list
+(make-instance 'bad-ship :x 0 :y 100 :s 2.5)
+(make-instance 'bad-ship :x 0 :y 200 :s 3)
+(make-instance 'bad-ship :x 0 :y 300 :s 3.5)
+(make-instance 'bad-ship :x 0 :y 400 :s 4)
+(make-instance 'bad-ship :x 0 :y 500 :s 4.5)
+)
+)
+)
+
+(defmethod on-key ((sketch combo-stomp) key state)
+  (if (and(eq key :W)(eq state :DOWN))(if (= *lost* 0)(thrusters)())())
+  (if (and(eq key :R)(eq state :DOWN))(if (= *lost* 1)(reset)())())
+  
+  (if (and(eq key :D)(eq state :DOWN))(setf *walk* 6)())
+  (if (and(eq key :D)(eq state :UP))(if (= *walk* 6)(setf *walk* 0)())())
+  
+  (if (and(eq key :A)(eq state :DOWN))(setf *walk* (- 6))())
+  (if (and(eq key :A)(eq state :UP))(if (= *walk* (- 6))(setf *walk* 0)())())
+)
+
+(make-instance 'combo-stomp)
