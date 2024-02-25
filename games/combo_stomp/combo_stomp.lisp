@@ -3,18 +3,18 @@
 
 (defclass bad-ship ()
   (
-    (x :initarg :x :initform 0)
-    (y :initarg :y :initform 0)
-    (s :initarg :s :initform 0)
-    (d :initarg :d :initform 0)
+    (x :initarg :x :initform 0 :accessor x)
+    (y :initarg :y :initform 0 :accessor y)
+    (s :initarg :s :initform 0 :accessor s)
+    (d :initarg :d :initform 0 :accessor d)
   )
 )
 
 (defclass splatter ()
   (
-    (x :initarg :x :initform 0)
-    (y :initarg :y :initform 0)
-    (l :initarg :l :initform 20)
+    (x :initarg :x :initform 0 :accessor x)
+    (y :initarg :y :initform 0 :accessor y)
+    (l :initarg :l :initform 20 :accessor l)
   )
 )
 
@@ -31,7 +31,7 @@
 
 (defparameter *px* 200)
 (defparameter *py* 600)
-(defparameter *gravity* 0.3)
+(defparameter *gravity* 0.5)
 (defparameter *movement* 0)
 (defparameter *walk* 0)
 (defparameter *yflip* 1)
@@ -49,7 +49,7 @@
 )
 
 (defun bounce ()
-  (setf *movement* (* (- *gravity*) 15))
+  (setf *movement* (* (- *gravity*) 10))
 )
 
 
@@ -79,9 +79,9 @@
   (let ((i 0))
     (loop
       (if (>= i (length *blood*))(return)())
-      (draw splatter :x (- (slot-value (elt *blood* i) 'x) 16) :y (- (slot-value (elt *blood* i) 'y) 16) :width 128 :height 64)
-      (setf (slot-value (elt *blood* i) 'l) (- (slot-value (elt *blood* i) 'l) 1))
-      (if (= (slot-value (elt *blood* i) 'l) 0)(
+      (draw splatter :x (- (x (elt *blood* i)) 16) :y (- (y (elt *blood* i)) 16) :width 128 :height 64)
+      (setf (l (elt *blood* i)) (- (l (elt *blood* i)) 1))
+      (if (= (l (elt *blood* i)) 0)(
       (lambda ()
         (setf *blood* (delete (elt *blood* i) *blood*))
       )
@@ -93,30 +93,30 @@
   (let ((i 0))
     (loop
       (if (= i (length *enemies*))(return)())
-      (if (= (slot-value (elt *enemies* i) 'd) 0)
-      (draw enemy :x (slot-value (elt *enemies* i) 'x) :y (slot-value (elt *enemies* i) 'y) :width 64 :height 32)
-      (draw spike :x (- (slot-value (elt *enemies* i) 'x) 16) :y (- (slot-value (elt *enemies* i) 'y) 8) :width (+ 64 32) :height (+ 32 16))
+      (if (= (d (elt *enemies* i)) 0)
+      (draw enemy :x (x (elt *enemies* i)) :y (y (elt *enemies* i)) :width 64 :height 32)
+      (draw spike :x (- (x (elt *enemies* i)) 16) :y (- (y (elt *enemies* i)) 8) :width (+ 64 32 16) :height (+ 32 16 8))
       )
-      (setf (slot-value (elt *enemies* i) 'x) (+ (slot-value (elt *enemies* i) 'x) (slot-value (elt *enemies* i) 's)))
-      (if (or(> (slot-value (elt *enemies* i) 'x) 500)(< (slot-value (elt *enemies* i) 'x) (- (+ 64 32))))
+      (setf (x (elt *enemies* i)) (+ (x (elt *enemies* i)) (s (elt *enemies* i))))
+      (if (or(> (x (elt *enemies* i)) 500)(< (x (elt *enemies* i)) (- (+ 64 32))))
       ((lambda ()
-        (setf (slot-value (elt *enemies* i) 'y) (random 625 (make-random-state t)))
-        (setf (slot-value (elt *enemies* i) 's) (- (slot-value (elt *enemies* i) 's)))
-        (setf (slot-value (elt *enemies* i) 'd) (random 2 (make-random-state t)))
+        (setf (y (elt *enemies* i)) (random 625 (make-random-state t)))
+        (setf (s (elt *enemies* i)) (- (s (elt *enemies* i))))
+        (setf (d (elt *enemies* i)) (random 2 (make-random-state t)))
       ))
       ())
-      (if (if-collided (slot-value (elt *enemies* i) 'x) (slot-value (elt *enemies* i) 'y))(
+      (if (if-collided (x (elt *enemies* i)) (y (elt *enemies* i)))(
       (lambda ()
-        (if (= (slot-value (elt *enemies* i) 'd) 1)(setf *lost* 1)())
-        (vector-push-extend (make-instance 'splatter :x (slot-value (elt *enemies* i) 'x)  :y (slot-value (elt *enemies* i) 'y)) *blood* )
+        (if (= (d (elt *enemies* i)) 1)(setf *lost* 1)())
+        (vector-push-extend (make-instance 'splatter :x (x (elt *enemies* i))  :y (y (elt *enemies* i))) *blood* )
         (bounce)
         (if (= *lost* 0)(setf *score* (+ *score* 125))())
-        (setf (slot-value (elt *enemies* i) 'y) (random 625 (make-random-state t)))
-        (setf (slot-value (elt *enemies* i) 'd) (random 2 (make-random-state t)))
-        (if (> (slot-value (elt *enemies* i) 's) 0)(setf (slot-value (elt *enemies* i) 'x) (- (+ 64 32)))(setf (slot-value (elt *enemies* i) 'x) 500))
-        (if (> (slot-value (elt *enemies* i) 's) 0)
-          (setf (slot-value (elt *enemies* i) 's) (+ (slot-value (elt *enemies* i) 's) 0.25))
-          (setf (slot-value (elt *enemies* i) 's) (- (slot-value (elt *enemies* i) 's) 0.25))
+        (setf (y (elt *enemies* i)) (random 625 (make-random-state t)))
+        (setf (d (elt *enemies* i)) (random 2 (make-random-state t)))
+        (if (> (s (elt *enemies* i)) 0)(setf (x (elt *enemies* i)) (- (+ 64 32)))(setf (x (elt *enemies* i)) 500))
+        (if (> (s (elt *enemies* i)) 0)
+          (setf (s (elt *enemies* i)) (+ (s (elt *enemies* i)) 0.25))
+          (setf (s (elt *enemies* i)) (- (s (elt *enemies* i)) 0.25))
         )
       )
       )())
@@ -155,7 +155,7 @@
   (setf *py* 600)
   (setf *score* 0)
   (setf *movement* 0)
-  (setf *gravity* 0.3)
+  (setf *gravity* 0.5)
   (setf *enemies* (list
 (make-instance 'bad-ship :x 0 :y 100 :s 2.5)
 (make-instance 'bad-ship :x 0 :y 200 :s 3)
