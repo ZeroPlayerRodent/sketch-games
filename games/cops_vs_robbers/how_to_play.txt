@@ -1,0 +1,16 @@
+ 
+HOW TO PLAY COMBO STOMP
+
+== CONTROLS ==
+
+WASD: Change movement direction
+
+== OBJECTIVES ==
+
+Pick up money bags while avoiding police officers.
+
+You are always moving, so use WASD to steer yourself in the right direction.
+
+The game will speed up as it progresses.
+
+Have fun!
