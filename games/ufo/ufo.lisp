@@ -3,9 +3,9 @@
 
 (defclass bad-ship ()
   (
-    (x :initarg :x :initform 0)
-    (y :initarg :y :initform 0)
-    (s :initarg :s :initform 0)
+    (x :initarg :x :initform 0 :accessor x)
+    (y :initarg :y :initform 0 :accessor y)
+    (s :initarg :s :initform 0 :accessor s)
   )
 )
 
@@ -66,15 +66,15 @@
   (let ((i 0))
     (loop
       (if (= i (length *enemies*))(return)())
-      (draw enemy :x (slot-value (elt *enemies* i) 'x) :y (slot-value (elt *enemies* i) 'y) :width 64 :height 64)
-      (setf (slot-value (elt *enemies* i) 'x) (+ (slot-value (elt *enemies* i) 'x) (slot-value (elt *enemies* i) 's)))
-      (if (> (slot-value (elt *enemies* i) 'x) 400)
+      (draw enemy :x (x (elt *enemies* i)) :y (y (elt *enemies* i)) :width 64 :height 64)
+      (setf (x (elt *enemies* i)) (+ (x (elt *enemies* i)) (s (elt *enemies* i))))
+      (if (> (x (elt *enemies* i)) 400)
       ((lambda ()
-        (setf (slot-value (elt *enemies* i) 'x) (- 64))
-        (setf (slot-value (elt *enemies* i) 'y) (random 625 (make-random-state t)))
+        (setf (x (elt *enemies* i)) (- 64))
+        (setf (y (elt *enemies* i)) (random 625 (make-random-state t)))
       ))
       ())
-      (if (if-collided (slot-value (elt *enemies* i) 'x) (slot-value (elt *enemies* i) 'y))(setf *lost* 1)())
+      (if (if-collided (x (elt *enemies* i)) (y (elt *enemies* i)))(setf *lost* 1)())
       (setf i (+ i 1))
     )
   )
@@ -96,12 +96,6 @@
   
   (if (= *lost* 1)(over)())
   
-)
-
-(defun score-up ()
-  (setf *py* 600)
-  (setf *gravity* 0.2)
-  (setf *movement* 0)
 )
 
 (defun thrusters ()

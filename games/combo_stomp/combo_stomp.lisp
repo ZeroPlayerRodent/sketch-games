@@ -55,7 +55,7 @@
 
 (defsketch combo-stomp
   (
-   (title "UFO")
+   (title "Combo Stomp")
    (width 500)
    (height 650)
    (player (load-resource "img/player.png"))
